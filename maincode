@@ -1,0 +1,996 @@
+from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { HomeComponent } from './home/home.component';
+import { RegisterComponent } from './register/register.component';
+import { ViewallusersComponent } from './viewallusers/viewallusers.component';
+import { AdminhomeComponent } from './adminhome/adminhome.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { AddquestionComponent } from './addquestion/addquestion.component';
+import { DisplayquestionComponent } from './displayquestion/displayquestion.component';
+import { QuestionComponent } from './question/question.component';
+import { LoginComponent } from './login/login.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+@NgModule({
+declarations: [
+AppComponent,
+HomeComponent,
+RegisterComponent,
+ViewallusersComponent,
+AdminhomeComponent,
+AddquestionComponent,
+DisplayquestionComponent,
+QuestionComponent,
+LoginComponent,
+DashboardComponent
+],
+imports: [
+BrowserModule,
+AppRoutingModule,
+ReactiveFormsModule,
+NgbModule,
+HttpClientModule,
+FormsModule
+],
+providers: [],
+bootstrap: [AppComponent]
+})
+export class AppModule { }
+App.component.ts:
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from './auth.service';
+@Component({
+selector: 'app-root',
+templateUrl: './app.component.html',
+styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+title = 'OnlineTestApplication';
+constructor(public authService: AuthService, private router: Router) { }
+logout() {
+this.authService.logout();
+this.router.navigate(['/login']); // Redirect to login page after logout
+}
+isAdmin: boolean = false;
+isUser: boolean = false;
+ngDoCheck() {
+let currenturl = this.router.url;
+console.log(currenturl);
+if (currenturl == "/admin") {
+this.isAdmin = true;
+this.isUser = false
+} else if (currenturl == "/") {
+this.isAdmin = false;
+this.isUser = true;
+}
+}
+}
+App.component.html:
+<!-- <div *ngIf="authService.currentUserValue?.email === 'admin'"> -->
+<div *ngIf="isAdmin">
+<nav class="navbar navbar-expand-lg text-light fixed-top navbar-dark" style="background-color:
+rgb(15,16,86);">
+<div class="container-fluid ms-3 me-3">
+<a class="navbar-brand" href="#">OnlineQuizApp</a>
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+data-bs-target="#navbarSupportedContent"
+aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle
+navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+<li class="nav-item">
+<a class="nav-link active" aria-current="page" routerLink="/viewall">Users</a>
+</li>
+<li class="nav-item">
+<a class="nav-link active" aria-current="page" routerLink="/register">AddUser</a>
+</li>
+<li class="nav-item">
+<a class="nav-link active" aria-current="page" routerLink="/addque">AddQuestion</a>
+</li>
+<li class="nav-item">
+<a class="nav-link active" aria-current="page" routerLink="/login">Login</a>
+</li>
+</ul>
+<form class="d-flex" role="search">
+<input class="form-control me-2" type="search" placeholder="Search"
+aria-label="Search">
+<button class="btn btn-success" type="submit">Search</button>
+</form>
+&nbsp;
+<button class="btn btn-danger" *ngIf="authService.currentUserValue"
+(click)="logout()">Logout</button>
+</div>
+</div>
+</nav>
+</div>
+<!-- =========================================================================================
+-->
+<!-- User Nav -->
+<!-- ======================= -->
+<!-- <div *ngIf="authService.currentUserValue?.role === 'user'"> -->
+<div *ngIf="isUser">
+<nav class="navbar navbar-expand-lg text-light fixed-top navbar-dark" style="background-color:
+rgb(15,16,86);">
+<div class="container-fluid ms-3 me-3">
+<a class="navbar-brand" routerLink="/">OnlineQuizApp</a>
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+data-bs-target="#navbarSupportedContent"
+aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle
+navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+<li class="nav-item">
+<a class="nav-link active" aria-current="page" routerLink="/">Home</a>
+</li>
+<li class="nav-item">
+<a class="nav-link active" aria-current="page" routerLink="#">About</a>
+</li>
+<li class="nav-item">
+<a class="nav-link active" aria-current="page" routerLink="#">Contact</a>
+</li>
+<li class="nav-item">
+<a class="nav-link active" aria-current="page" routerLink="/login">Login</a>
+</li>
+</ul>
+<form class="d-flex" role="search">
+<input class="form-control me-2" type="search" placeholder="Search"
+aria-label="Search">
+<button class="btn btn-success" type="submit">Search</button>
+</form>
+&nbsp;
+<button class="btn btn-danger" *ngIf="authService.currentUserValue"
+(click)="logout()">Logout</button>
+</div>
+</div>
+</nav>
+</div>
+<!-- =========================================================================================
+-->
+<!-- for user icon -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- =========================================================================================
+-->
+<br>
+<br>
+<router-outlet></router-outlet>
+App-routing.module.ts:
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { HomeComponent } from './home/home.component';
+import { RegisterComponent } from './register/register.component';
+import { ViewallusersComponent } from './viewallusers/viewallusers.component';
+import { AdminhomeComponent } from './adminhome/adminhome.component';
+import { AddquestionComponent } from './addquestion/addquestion.component';
+import { DisplayquestionComponent } from './displayquestion/displayquestion.component';
+import { LoginComponent } from './login/login.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { AuthGuard } from './auth.guard';
+import { QuestionComponent } from './question/question.component';
+const routes: Routes = [
+{ path: '', component: HomeComponent },
+{ path: 'home', component: HomeComponent },
+{ path: 'admin', component: AdminhomeComponent, canActivate: [AuthGuard] },
+{ path: 'register', component: RegisterComponent },
+{ path: 'viewall', component: ViewallusersComponent },
+{ path: 'addque', component: AddquestionComponent },
+{ path: 'quiz/:subjectId', component: DisplayquestionComponent, canActivate: [AuthGuard] },
+{ path: 'login', component: LoginComponent },
+{ path: 'score', component: DashboardComponent, canActivate: [AuthGuard] },
+{ path: 'que', component: QuestionComponent }
+];
+@NgModule({
+imports: [RouterModule.forRoot(routes)],
+exports: [RouterModule]
+})
+export class AppRoutingModule { }
+Auth.guard.ts:
+import { Injectable } from '@angular/core';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from
+'@angular/router';
+import { AuthService } from './auth.service';
+@Injectable({
+providedIn: 'root'
+})
+export class AuthGuard {
+constructor(private authService: AuthService, private router: Router) { }
+canActivate(): boolean {
+if (!this.authService.currentUserValue) {
+this.router.navigate(['/login']);
+return false;
+}
+return true;
+}
+}
+Auth.service.ts:
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+@Injectable({
+providedIn: 'root'
+})
+export class AuthService {
+private currentUserSubject: BehaviorSubject<any>;
+public currentUser: Observable<any>;
+private API_URL = 'http://localhost:3000';
+constructor(private http: HttpClient) {
+this.currentUserSubject = new
+BehaviorSubject<any>(JSON.parse(localStorage.getItem('currentUser') as string));
+this.currentUser = this.currentUserSubject.asObservable();
+}
+public get currentUserValue() {
+return this.currentUserSubject.value;
+}
+login(email: string, password: string) {
+return this.http.get<any[]>(`${this.API_URL}/users`).pipe(
+map(users => {
+const user = users.find(u => u.email === email && u.password === password);
+if (user) {
+localStorage.setItem('currentUser', JSON.stringify(user));
+this.currentUserSubject.next(user);
+return user;
+}
+return null;
+})
+);
+}
+logout() {
+localStorage.removeItem('currentUser');
+this.currentUserSubject.next(null);
+}
+}
+Subject.service.ts:
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+@Injectable({
+providedIn: 'root'
+})
+export class SubjectService {
+private readonly API_URL = 'http://localhost:3000';
+constructor(private http: HttpClient) { }
+// Fetch all subjects
+getSubjects(): Observable<any[]> {
+return this.http.get<any[]>(`${this.API_URL}/subjects`);
+}
+// Fetch questions by subject ID
+getQuestionsBySubject(subjectId: number): Observable<any[]> {
+return this.http.get<any[]>(`${this.API_URL}/questions?subjectId=${subjectId}`);
+}
+// Add a new subject
+addSubject(subject: any): Observable<any> {
+return this.http.post<any>(`${this.API_URL}/subjects`, subject);
+}
+// Add a new question
+addQuestion(question: any): Observable<any> {
+return this.http.post<any>(`${this.API_URL}/questions`, question);
+}
+getUserScores(userId: number): Observable<any[]> {
+return this.http.get<any[]>(`${this.API_URL}/questions?userId=${userId}`);
+}
+updateUserScore(userId: number, subjectId: string, score: number): Observable<any> {
+console.log('userId:', userId);
+console.log('subjectId:', subjectId);
+console.log('score:', score);
+const scoreUpdate = {};
+scoreUpdate[`score.${subjectId}`] = score;
+console.log('scoreUpdate:', scoreUpdate);
+return this.http.patch<any>(`${this.API_URL}/users/${userId}`, scoreUpdate);
+}
+getTotalScore(userId: number): Observable<any> {
+return this.http.get<any>(`${this.API_URL}/users/${userId}`).pipe(
+map(user => {
+let totalScore = 0;
+for (let key in user) {
+if (key.startsWith("score.")) {
+totalScore += user[key];
+}
+}
+user.totalScore = totalScore;
+return user;
+}),
+switchMap(updatedUser => {
+// Once we have updated the user object with the totalScore, we make an HTTP PATCH
+request to save it back
+return this.http.patch<any>(`${this.API_URL}/users/${userId}`, { totalScore:
+updatedUser.totalScore }).pipe(
+// Return the updated user after saving
+map(() => updatedUser)
+);
+})
+);
+}
+getUserDetails(userId: number): Observable<any> {
+return this.http.get<any>(`${this.API_URL}/users/${userId}`);
+}
+}
+User.service.ts:
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+@Injectable({
+providedIn: 'root'
+})
+export class UserService {
+constructor(private httpclient: HttpClient) { }
+private apiurl = "http://localhost:3000/users";
+AddNewUser(userinfo: any): Observable<object> {
+return this.httpclient.post(this.apiurl, userinfo);
+}
+ViewAllUsersDetails(): Observable<any> {
+return this.httpclient.get(this.apiurl);
+}
+DeleteUserById(id: any): Observable<any> {
+return this.httpclient.delete(this.apiurl + '/' + id);
+}
+}
+Addquestion.component.ts:
+import { Component } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators, FormArray } from '@angular/forms';
+import { Router } from '@angular/router';
+import { SubjectService } from '../subject.service';
+@Component({
+selector: 'app-addquestion',
+templateUrl: './addquestion.component.html',
+styleUrls: ['./addquestion.component.css'],
+})
+export class AddquestionComponent {
+questionForm: FormGroup;
+subjects: any[] = [];
+constructor(private fb: FormBuilder, private subjectService: SubjectService) { }
+ngOnInit(): void {
+this.initForm();
+this.loadSubjects();
+}
+initForm(): void {
+this.questionForm = this.fb.group({
+subjectId: ['', Validators.required],
+text: ['', Validators.required],
+options: this.fb.array([
+this.fb.control('', Validators.required),
+this.fb.control('', Validators.required),
+this.fb.control('', Validators.required),
+this.fb.control('', Validators.required)
+]),
+answer: ['', Validators.required]
+});
+}
+loadSubjects(): void {
+this.subjectService.getSubjects().subscribe(data => {
+this.subjects = data;
+});
+}
+onSubmit(): void {
+if (this.questionForm.valid) {
+this.subjectService.addQuestion(this.questionForm.value).subscribe(() => {
+alert('Question added!');
+this.questionForm.reset();
+});
+} else {
+alert('Please fill out the form corsrectly!');
+}
+}
+get options(): FormArray {
+return this.questionForm.get('options') as FormArray;
+}
+get myControl(): FormControl {
+return this.questionForm.get('myControlName') as FormControl;
+}
+}
+Addquestion.component.html:
+<br>
+<div class="row">
+<div class="col-md-7 m-auto">
+<div class="card">
+<!-- <br> -->
+<div class="card-header text-center">
+<h4>Add new Question here</h4>
+</div>
+<div class="card-body border-dark">
+<form [formGroup]="questionForm" (ngSubmit)="onSubmit()">
+<div class="col-md-6">
+Select Subject:
+<select class="form-select form-select-sm" formControlName="subjectId">
+<option selected disabled>Select Subject</option>
+<option *ngFor="let subject of subjects" [value]="subject.id">
+{{ subject.name }}
+</option>
+</select>
+</div>
+<br>
+<div>
+<input class="form-control form-control-sm" type="text"
+formControlName="text"
+placeholder="Enter Question here">
+</div>
+<br>
+<div class="row" formArrayName="options">
+<div class="col-md-6" *ngFor="let option of options.controls; let i =
+index">
+<input class="form-control form-control-sm" type="text"
+[formControlName]="i"
+placeholder="Option {{ i + 1 }}"> &nbsp;
+</div>
+</div>
+<div>
+<input class="form-control form-control-sm" type="text"
+formControlName="answer"
+placeholder="Write Correct Answer here">
+</div>
+<br>
+<button class="btn btn-dark" type="submit">Add Question</button>
+&nbsp;
+<button class="btn btn-dark" type="reset">&nbsp; Reset &nbsp; </button>
+</form>
+</div>
+</div>
+</div>
+</div>
+Adminhome.component.html:
+<br>
+<div class="container">
+<div class="card-body">
+<b>
+<h2 class="mb-2">Welcome Admin</h2>
+</b>
+<br>
+<p class="card-text">The Administrative Portal offers a centralized platform for quiz
+coordinators to manage,
+curate, and monitor quizzes. With user-friendly interfaces, coordinators can easily
+craft questions, set
+time limits, analyze participant responses, and derive insights. It ensures smooth
+operations, real-time
+monitoring, and fosters enhanced participant engagement. Navigate effortlessly and
+elevate your quizzing
+experience.</p>
+</div>
+<br>
+<br>
+<div class="row col-md-10 m-auto">
+<div class="col-md-3">
+<div class="card">
+<div class="card-body text-white" style="background-color: rgb(15,16,86);">
+<h5 class="card-title">View Users</h5>
+<hr>
+<p class="card-text">View all the registered user here. To view click od the
+button</p>
+<a routerLink="/viewall" class="btn btn-light">View All User</a>
+</div>
+</div>
+</div>
+<div class="col-md-3">
+<div class="card">
+<div class="card-body text-white" style="background-color: rgb(15,16,86);">
+<h5 class="card-title">Add new users</h5>
+<hr>
+<p class="card-text">Admin can add a new user If needed. Click on the button
+to add new user</p>
+<a routerLink="/register" class="btn btn-light">Add New User</a>
+</div>
+</div>
+</div>
+<div class="col-md-3">
+<div class="card">
+<div class="card-body text-white" style="background-color: rgb(15,16,86);">
+<h5>Add New Question</h5>
+<hr>
+<p class="card-text">To add a new Question Click on the button. Choose a
+subject first</p>
+<a routerLink="/addque" class="btn btn-light">Add Question</a>
+</div>
+</div>
+</div>
+<div class="col-md-3">
+<div class="card">
+<div class="card-body text-white" style="background-color: rgb(15,16,86);">
+<h5>View Questions</h5>
+<hr>
+<p class="card-text">You can View all the Questions & Answers here and
+manage</p>
+<a routerLink="/que" class="btn btn-light">View Questions</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+displatquestion.component.html:
+<br>
+<br>
+<div *ngIf="!authService.currentUserValue">
+Login first!
+</div>
+<div *ngIf="authService.currentUserValue">
+<!-- your quiz code here -->
+<div class="container">
+<div class="col-sm-6 m-auto quiz-container">
+<div>
+<div class="card-body" *ngIf="questions.length > 0">
+<h5 class="card-title question">{{ questions[currentQuestionIndex].id }}. {{
+questions[currentQuestionIndex].text }}</h5>
+<form [formGroup]="quizForm">
+<ul class="list-group"
+*ngFor="let option of questions[currentQuestionIndex]?.options; let
+idx = index">
+<li class="list-group-item list-group-item-action options">
+<input class="form-check-input" type="radio" [value]="option"
+formControlName="answer">
+<!-- <label class="form-check-label"> -->
+{{ option }}
+<!-- </label> -->
+&nbsp;
+</li>
+</ul>
+<br>
+<button class="btn btn-sm btn-primary" (click)="previousQuestion()"
+type="button"
+[disabled]="currentQuestionIndex == 0">Previous</button>
+&nbsp;
+<button class="btn btn-sm btn-primary next" (click)="nextQuestion()"
+type="button"
+[disabled]="currentQuestionIndex == questions.length -
+1">Next</button>
+<br>
+<br>
+<div class="d-grid gap-2">
+<button class="btn btn-sm btn-success btn-block text-center"
+(click)="submitQuiz()"
+type="button" *ngIf="currentQuestionIndex == questions.length -
+1">Submit</button>
+</div>
+<div *ngIf="isQuizSubmitted">
+Quiz completed! Your score for this quiz is {{ userScore }}.
+Your total score across all subjects is {{
+authService.currentUserValue?.score }}
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+Displayquestion.component.ts:
+import { Component } from '@angular/core';
+import { SubjectService } from '../subject.service';
+import { ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { AuthService } from '../auth.service';
+@Component({
+selector: 'app-displayquestion',
+templateUrl: './displayquestion.component.html',
+styleUrls: ['./displayquestion.component.css']
+})
+export class DisplayquestionComponent {
+questions: any[] = [];
+currentQuestionIndex = 0;
+quizForm: FormGroup;
+constructor(
+private route: ActivatedRoute,
+private fb: FormBuilder,
+private subjectService: SubjectService,
+public authService: AuthService
+) { }
+ngOnInit(): void {
+let subjectId: number = 0;
+if (this.route.snapshot.paramMap) {
+subjectId = +this.route.snapshot.paramMap.get('subjectId')!;
+}
+// const subjectId = +this.route.snapshot.paramMap?.get('subjectId');
+this.loadQuestions(subjectId);
+this.buildQuizForm();
+}
+loadQuestions(subjectId: number): void {
+this.subjectService.getQuestionsBySubject(subjectId).subscribe(data => {
+this.questions = data;
+});
+}
+buildQuizForm(): void {
+this.quizForm = this.fb.group({
+answer: ['']
+});
+}
+nextQuestion(): void {
+if (this.quizForm.value.answer === this.questions[this.currentQuestionIndex].answer) {
+this.userScore++;
+}
+this.quizForm.reset();
+if (this.currentQuestionIndex < this.questions.length - 1) {
+this.currentQuestionIndex++;
+} else {
+alert(`Quiz completed! Your score is ${this.userScore} out of ${this.questions.length}`);
+}
+}
+previousQuestion(): void {
+if (this.currentQuestionIndex > 0) {
+this.currentQuestionIndex--;
+}
+}
+resetQuiz(): void {
+this.currentQuestionIndex = 0;
+this.userScore = 0;
+this.quizForm.reset();
+}
+userScore = 0;
+isScoreSaved = false;
+isQuizSubmitted = false;
+submitQuiz(): void {
+// Check the correct answer for the current question
+if (this.quizForm.value.answer === this.questions[this.currentQuestionIndex].answer) {
+this.userScore++;
+}
+// After the last question, update the total score in the database
+if (this.currentQuestionIndex == this.questions.length - 1) {
+// You can adjust this based on how your API and data structure is set up
+this.subjectService.updateUserTotalScore(this.authService.currentUserValue.id,
+this.userScore).subscribe(() => {
+this.isQuizSubmitted = true;
+});
+}
+alert(`Quiz completed! Your score is ${this.userScore} out of ${this.questions.length}`);
+this.isQuizSubmitted = true;
+this.resetQuiz(); // Optionally reset the quiz after submission
+}
+}
+Home.component.html:
+<br>
+<div class="container">
+<h2>Welcome to the quiz</h2>
+</div>
+<div class="container">
+<br>
+<div class="row" style="justify-content: center;">
+<div class="col-sm-5">
+<div class="card border-dark" style="height:22rem">
+<div class="card-body text-white" style="background-color: rgb(15,16,86);">
+<p>Read the instructions first:</p>
+<ol>
+<li>Begin the quiz at the designated time to ensure you have ample time
+to answer all questions
+</li>
+<li>Each of the 30 questions carries a value of one mark. Ensure to
+answer to the best of your
+ability.</li>
+<li>There is no penalty for incorrect answers, so attempt all questions
+without fear of
+deductions.</li>
+<li>Only one response is allowed per question. Once you've chosen an
+answer, it cannot be
+modified.</li>
+<li>After answering all questions, click the 'Submit' button. Ensure to
+submit your quiz before
+the allotted time ends.</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="col-sm-5">
+<div class="card border-dark" style="height:22rem">
+<div class="card-body text-white" style="background-color: rgb(15,16,86);">
+<h4>Subjects</h4>
+<p>Choose a subject</p>
+<ul class="list-group list-group-flush">
+<li *ngFor="let subject of subjects">
+<b><a [routerLink]="['/quiz', subject.id]" class="list-group-item
+list-group-item-action">{{
+subject.name }}</a></b>
+&nbsp;
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+Home.component.ts:
+import { Component } from '@angular/core';
+import { SubjectService } from '../subject.service';
+@Component({
+selector: 'app-home',
+templateUrl: './home.component.html',
+styleUrls: ['./home.component.css']
+})
+export class HomeComponent {
+subjects: any[] = [];
+constructor(private subjectService: SubjectService) { }
+ngOnInit(): void {
+this.loadSubjects();
+}
+loadSubjects(): void {
+this.subjectService.getSubjects().subscribe(data => {
+this.subjects = data;
+});
+}
+}
+Login.component.html:
+<div class="container">
+<!-- <div class="row d-flex justify-content-center align-items-center h-100"> -->
+<br>
+<br>
+<div class="card col-md-4 m-auto" style="border-radius: 1rem;">
+<!-- <div class="col-md-6 col-lg-7 d-flex align-items-center"> -->
+<div class="card-body p-4 p-lg-4 text-black">
+<form (ngSubmit)="login()">
+<div class="d-flex align-items-center mb-1 pb-2">
+<h4 class="fw-bold">Online Quiz Application</h4>
+</div>
+<h6 class="fw-normal mb-3 pb-2" style="letter-spacing: 1px;">Sign into your
+account
+</h6>
+<div class="form-outline mb-4">
+<input type="email" id="email" name="email" [(ngModel)]="email"
+class="form-control"
+placeholder="Email" />
+<!-- <label class="form-label" for="form2Example17">Email </label> -->
+</div>
+<div class="form-outline mb-4">
+<input type="password" id="password" name="password" [(ngModel)]="password"
+class="form-control"
+placeholder="Password" />
+<!-- <label class="form-label" for="form2Example27">Password</label> -->
+</div>
+<div class="d-grid gap-2 mb-3">
+<button class="btn btn-dark btn-block" type="submit">Login</button>
+</div>
+<p class="mb-5 pb-lg-2" style="color: #393f81;">Don't have an account?
+<a routerLink="/register" style="color: #393f81;">Register here</a>
+</p>
+</form>
+<div *ngIf="error">{{ error }}</div>
+</div>
+</div>
+</div>
+Login.component.ts:
+import { Component } from '@angular/core';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
+@Component({
+selector: 'app-login',
+templateUrl: './login.component.html',
+styleUrls: ['./login.component.css']
+})
+export class LoginComponent {
+email: string;
+password: string;
+error: string;
+constructor(private authService: AuthService, private router: Router) { }
+login() {
+this.authService.login(this.email, this.password).subscribe(user => {
+if (user) {
+if (user.email === 'admin') {
+this.router.navigate(['/admin']); // Redirect to admin page or dashboard
+} else {
+this.router.navigate(['/']); // Redirect to the main or user dashboard page
+}
+} else {
+this.error = 'Invalid credentials';
+}
+});
+}
+}
+Register.component.html:
+<br>
+<div class="container">
+<br>
+<br>
+<div class="card col-md-4 m-auto" style="border-radius: 1rem;">
+<div class="card-body p-4 p-lg-4 text-black">
+<form [formGroup]="userform" (ngSubmit)="CreateNewUser()">
+<div class="d-flex align-items-center mb-1 pb-2">
+<h4 class="fw-bold">New User Form</h4>
+</div>
+<h6 class="fw-normal mb-3 pb-2" style="letter-spacing: 1px;">Sign-up your
+account
+</h6>
+<div class="form-outline mb-4">
+<input type="text" formControlName="username" class="form-control" [ngModel]
+placeholder="User Name" />
+<span class="errorinfo"
+*ngIf="userform.controls.username.touched &&
+userform.controls.username.invalid">
+<b>User's name is Required</b>
+</span>
+</div>
+<div class="form-outline mb-4">
+<input type="email" formControlName="email" class="form-control"
+placeholder="Email" />
+<span class="errorinfo" *ngIf="userform.controls.email.touched &&
+userform.controls.email.invalid">
+<b>Email is Required</b>
+</span>
+</div>
+<div class="form-outline mb-4">
+<input type="password" formControlName="password" class="form-control"
+placeholder="Password" />
+<span class="errorinfo"
+*ngIf="userform.controls.password.touched &&
+userform.controls.password.invalid">
+<b>Password is Required</b>
+</span>
+</div>
+<div class="">
+<input type="submit" value="Register" class="btn btn-dark text-center" />
+&nbsp;
+<input type="reset" value="Reset" class="btn btn-dark text-center" />
+</div>
+<div [innerHTML]="msg"></div>
+</form>
+</div>
+</div>
+</div>
+Register.component.ts:
+import { Component } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { UserService } from '../user.service';
+@Component({
+selector: 'app-register',
+templateUrl: './register.component.html',
+styleUrls: ['./register.component.css']
+})
+export class RegisterComponent {
+msg: string = "";
+constructor(
+private builder: FormBuilder,
+private router: Router,
+private userservice: UserService
+) { }
+userform = new FormGroup({
+username: new FormControl('', [Validators.required]),
+email: new FormControl('', [Validators.required]),
+password: new FormControl('', [Validators.required])
+})
+CreateNewUser() {
+if (this.userform.valid) {
+this.userservice.AddNewUser(this.userform.value).subscribe(data => {
+this.router.navigate(['/viewall']);
+alert("Registered successfully...");
+this.userform.reset();
+})
+} else {
+alert("Invalid Form");
+}
+}
+}
+Viewallusers.component.html:
+<br>
+<div class="row">
+<div class="col-md-10 m-auto">
+<div class="card">
+<div class="text-center text-light p-2" style="background-color: rgb(15,16,86);">
+<h5>All Users Details</h5>
+</div>
+<div class="card-body">
+<table class="table table-bordered table-stripped text-center table-sm">
+<thead class="table-secondary">
+<tr>
+<th>User Id</th>
+<th>User Name</th>
+<th>User Email</th>
+<th>Password</th>
+<th>Score</th>
+<th>Operations</th>
+</tr>
+</thead>
+<tbody>
+<tr *ngFor="let user of userinfo | async">
+<td>{{user?.id}}</td>
+<td>{{user?.username}}</td>
+<td>{{user?.email}}</td>
+<td>{{user?.password}}</td>
+<td>{{user?.score}}</td>
+<td>
+<input type="button" value="View" class="btn btn-warning"
+style="--bs-btn-padding-y: .12rem; --bs-btn-padding-x:
+.3rem; --bs-btn-font-size: .70rem;">
+&nbsp;
+<input type="button" value="Delete" class="btn btn-danger"
+style="--bs-btn-padding-y: .12rem; --bs-btn-padding-x:
+.3rem; --bs-btn-font-size: .70rem;"
+(click)="delUser(user.id)">
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+Viewallusers.component.ts:
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { UserService } from '../user.service';
+@Component({
+selector: 'app-viewallusers',
+templateUrl: './viewallusers.component.html',
+styleUrls: ['./viewallusers.component.css']
+})
+export class ViewallusersComponent implements OnInit {
+userinfo: Observable<any>;
+constructor(
+private userservice: UserService,
+private router: Router
+) { }
+viewAllUsers() {
+this.userinfo = this.userservice.ViewAllUsersDetails();
+}
+ngOnInit(): void {
+// this method will be executed only once when page is initlized
+this.viewAllUsers();
+}
+delUser(id: any) {
+this.userservice.DeleteUserById(id).subscribe(data => {
+this.viewAllUsers();
+});
+}
+}
+Dashboard.component.html
+<br>
+<br>
+<div class="container">
+<div class="col-sm-5 m-auto">
+<div class="card">
+<div class="card-body" style="background-color: rgb(15,16,86);">
+<div class="card-body" style="background-color: white;height:20rem;">
+<div *ngIf="userData">
+<h4 class="card-title text-center fw-bold" style="color: purple;">
+<span style='font-size:30px;'>&#9997;</span>
+Score Card for {{ userData.username }}
+<span style='font-size:30px;'>&#9997;</span>
+</h4>
+<hr style="height: 1px;">
+<div class="text-center fs-5">
+<div>
+<strong> HTML :</strong> {{ userData['score.1'] }} out of 10
+</div>
+<br>
+<div>
+<strong> Java :</strong> {{ userData['score.2'] }} out of 10
+</div>
+<br>
+<div>
+<strong> Angular :</strong> {{ userData['score.3'] }} out of 10
+</div>
+<br>
+<div>
+<strong>Total Score:</strong> {{ userData.totalScore }} out of
+30
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+Dashboard.component.ts
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
+import { SubjectService } from '../subject.service';
+@Component({
+selector: 'app-dashboard',
+templateUrl: './dashboard.component.html',
+styleUrls: ['./dashboard.component.css']
+})
+export class DashboardComponent {
+userData: any;
+Object = Object;
+constructor(private authService: AuthService, private subjectService: SubjectService) { }
+ngOnInit(): void {
+const userId = this.authService.currentUserValue.id;
+this.subjectService.getUserDetails(userId).subscribe(data => {
+this.userData = data;
+});
+}
+}
